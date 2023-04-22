@@ -1,3 +1,4 @@
+In the Blade view 'invitation.blade.php', update the URL(http://localhost:8080/) to the Vue.js domain name.
 
 Configuration : 
 
