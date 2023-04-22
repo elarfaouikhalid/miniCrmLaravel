@@ -34,6 +34,6 @@ class LogUserInvitationConfirmed
         }
         $invitation->status = 'confirmed';
         $invitation->save();
-        Log::channel('activity_log')->info($date->format('d-m-Y - H:i') . ' /  "' . $invitation->name . '" à valider l’invitation "');
+        Log::channel('activity_log')->info($date->format('d-m-Y - H:i') . ' /  "' . $invitation->name . 'à valider l’invitation');
     }
 }

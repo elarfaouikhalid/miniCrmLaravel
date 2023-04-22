@@ -6,6 +6,6 @@
 <body>
     <h1>Invitation to Join Company</h1>
     <p>You have been invited to join the company. Please click the link below to create your account.</p>
-    <a href="http://192.168.43.203:8080/employee/invite/{{$invitation->token}}">Create Account</a>
+    <a href="http://localhost:8080/employee/invite/{{$invitation->token}}">Create Account</a>
 </body>
 </html>

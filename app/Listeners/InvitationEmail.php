@@ -28,7 +28,6 @@ class InvitationEmail
      */
     public function handle(InvitationSent $event)
     {
-        dd($event->invitation);
         $invitation = $event->invitation;
         Mail::to($invitation->email)->send(new InvitationMail($invitation));
     }

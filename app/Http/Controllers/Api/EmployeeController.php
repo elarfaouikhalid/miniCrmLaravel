@@ -4,55 +4,38 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\EmployeeConfirmed;
 use App\Events\EmployeeInvitationAccepted;
-use App\Events\EmployeeProfileConfirmed;
-use App\Events\InvitationClicked;
 use App\Http\Controllers\Controller;
 use App\Models\Invitation;
-use App\Models\User;
+use App\Repositories\EmployeeRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
 {
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'token' => 'required',
-        ]);
-        // dd($validator);
-        $invitation = Invitation::where('token', $request->token)->first();
-     
-        if (! $invitation) {
-            return response()->json([
-                "errors" => "this link is exipred"
-            ], 422);
-        }
+    protected $employeeRepository;
 
-     
-        return response()->json([
-            "success" => "confirm your account"
-        ], 200);
+    public function __construct(EmployeeRepositoryInterface $employeeRepository)
+    {
+        $this->employeeRepository = $employeeRepository;
     }
 
     public function validateInvitation(Request $request, $token)
     {
+        $invitation = Invitation::where('token', $token)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->first();
 
-        $invitation = Invitation::where('token', $token)->Where("status", "pending")->OrWhere("status", "confirmed")->first();
-        
-        if (! $invitation) {
+        if (!$invitation) {
             return response()->json([
-                "errors" => "this link is exipred"
+                "errors" => "This link is expired"
             ], 422);
         }
-        
+
         event(new EmployeeInvitationAccepted($invitation, Carbon::now()));
-     
+
         return response()->json([
-            "success" => "confirm your account",
+            "success" => "Confirm your account",
             "token" => $token,
             "email" => $invitation->email
         ], 200);
@@ -69,62 +52,24 @@ class EmployeeController extends Controller
             'password' => 'required|confirmed|min:8'
         ]);
 
-        $validatedData = $validator->validated();
-
-        if($validator->fails()){
-             return response()->json([
+        if ($validator->fails()) {
+            return response()->json([
                 "errors" => $validator->errors()
             ], 400);
         }
-        DB::beginTransaction();
 
         try {
-            $employee = new User([
-                'name' => $validatedData['name'],
-                'email' => $validatedData['email'],
-                'address' => $validatedData['address'],
-                'phone' => $validatedData['phone'],
-                'date_of_birth' => $validatedData['date_of_birth'],
-                'password' => Hash::make($validatedData['password']),
-            ]);
-            $employee->save();
+            $employee = $this->employeeRepository->create($validator->validated());
+
             event(new EmployeeConfirmed($employee, now()));
-            DB::commit();
+
             return response()->json([
-                "success" => "Your Acoount is Confirmed"
+                "success" => "Your account is confirmed"
             ], 200);
         } catch (\Exception $e) {
-            DB::rollback();
-
             return response()->json([
-                "errors" => $e
-            ], 422);
-        }
-    }
-
-    public function checkpassword(Request $request) 
-    {
-        $validator = Validator::make($request->all(), [
-            'password' => 'required|confirmed|min:8'
-        ]);
-
-
-        if($validator->fails()){
-             return response()->json([
-                "errors" => $validator->errors()
-             ], 422);
-        }
-
-        try {
-
-            return response()->json([
-                "success" => "next"
-            ], 200);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                "error" => "password dosn't match",
-            ], 422);
+                "errors" => $e->getMessage()
+            ], 422) ;
         }
     }
 
