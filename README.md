@@ -8,7 +8,7 @@ npm 6.14.10
 Composer 2.0.8
 Vue.js version: 3.0.0
 
-## Project Overview
+## Overview
 
 This project is built using several key software development concepts, including:
 
