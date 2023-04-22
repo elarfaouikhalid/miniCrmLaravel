@@ -10,7 +10,7 @@ Vue.js version: 3.0.0
 
 ## Overview
 
-This project is built using several key software development concepts, including:
+This mini crm project is built using several key software development concepts, including:
 
 - Interfaces
 - Database listeners and events
