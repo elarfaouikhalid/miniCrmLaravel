@@ -53,4 +53,23 @@ class AuthController extends Controller
         Auth::guard('web')->logout();
         return response()->json(['message' => 'User successfully signed out']);
     }
+    
+   // tracking client behavior
+    public function getLogs()
+    {
+        $logs = [];
+        $logFile = storage_path('logs/activity.log');
+        
+        if (file_exists($logFile)) {
+            $logContents = file_get_contents($logFile);
+            preg_match_all('/(?<=local\.INFO: ).*/', $logContents, $matches);
+            $logs = $matches[0];
+    
+            $logs = array_map(function($log) {
+                return preg_replace('/\s*\\\\+\s*|"/', '', $log);
+            }, $logs);
+        }
+        
+        return response()->json(['logs' => $logs]);
+    }
 }
