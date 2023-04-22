@@ -31,12 +31,12 @@ class LogUserProfileValidated
         // dd("test");
         $invitation = $event->employee;
         $date = $event->date;
-        // $EmployeeStatus = Invitation::where('email', $invitation->email)->first();
+        $EmployeeStatus = Invitation::where('email', $invitation->email)->first();
 
-        // if ($EmployeeStatus) {
-        //     $EmployeeStatus->status = 'validated';
-        //     $EmployeeStatus->save();
-        // }
-        Log::channel('activity_log')->info($date->format('d-m-Y - H:i') . ' / "' . $invitation->name . '" à confirmer son profile "');
+        if ($EmployeeStatus) {
+            $EmployeeStatus->status = 'validated';
+            $EmployeeStatus->save();
+        }
+        Log::channel('activity_log')->info($date->format('d-m-Y - H:i') . ' / "' . $invitation->name . 'à confirmer son profile');
     }
 }
