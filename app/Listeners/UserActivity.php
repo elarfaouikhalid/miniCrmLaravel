@@ -34,7 +34,7 @@ class UserActivity
         $companyName = $event->companyName;
         $adminName = $event->adminName;
         // send email
-        Mail::to($invitation->email)->send(new InvitationMail($invitation));
+        Mail::to($invitation->email)->queue(new InvitationMail($invitation));
         // stock behavior in storage/logs/activity.log
         Log::channel('activity_log')->info($date->format('d-m-Y - H:i') . ' / Admin "' . $adminName . '" a invite l\'employé "' . $invitation->name . '" à joindre la société "' . $companyName . '"');
     }

@@ -29,6 +29,6 @@ class InvitationEmail
     public function handle(InvitationSent $event)
     {
         $invitation = $event->invitation;
-        Mail::to($invitation->email)->send(new InvitationMail($invitation));
+        Mail::to($invitation->email)->queue(new InvitationMail($invitation));
     }
 }
